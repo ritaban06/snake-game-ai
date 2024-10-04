@@ -46,7 +46,7 @@ pip install pygame numpy
 3. Run the game:
 
 ```bash
-python snake_game_ai.py
+python main.py
 ```
 
 ## How to Play
