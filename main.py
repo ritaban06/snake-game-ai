@@ -1,6 +1,7 @@
 import pygame
 import random
 import numpy as np
+from collections import deque
 
 # Initialize Pygame
 pygame.init()
@@ -25,7 +26,7 @@ snake_speed = 15
 clock = pygame.time.Clock()
 
 # Font
-font = pygame.font.SysFont(None, 50)
+font = pygame.font.SysFont(None, 30)
 
 def our_snake(snake_block, snake_list):
     for x in snake_list:
@@ -33,52 +34,91 @@ def our_snake(snake_block, snake_list):
 
 def message(msg, color):
     mesg = font.render(msg, True, color)
-    window.blit(mesg, [width / 6, height / 3])
+    window.blit(mesg, [10, 10])
+
+import pygame
+import random
+import numpy as np
+from collections import deque
+
+# [Previous code remains the same up to the bfs function]
+
+def bfs(start, goal, grid):
+    queue = deque([[start]])
+    visited = set([start])
+    
+    while queue:
+        path = queue.popleft()
+        y, x = path[-1]
+        
+        if (y, x) == goal:
+            return path
+        
+        for y2, x2 in ((y+1,x), (y-1,x), (y,x+1), (y,x-1)):
+            if (0 <= y2 < grid.shape[0] and 0 <= x2 < grid.shape[1] and 
+                grid[int(y2)][int(x2)] != 1 and (y2, x2) not in visited):
+                queue.append(path + [(y2, x2)])
+                visited.add((y2, x2))
+    
+    return None
+
+def ai_make_decision(x1, y1, foodx, foody, snake_list):
+    grid = np.zeros((height // snake_block, width // snake_block))
+    
+    for segment in snake_list:
+        grid[int(segment[1] // snake_block)][int(segment[0] // snake_block)] = 1
+    
+    path = bfs((y1 // snake_block, x1 // snake_block), 
+               (foody // snake_block, foodx // snake_block), 
+               grid)
+    
+    if path:
+        next_move = path[1]
+        dx = (next_move[1] * snake_block) - x1
+        dy = (next_move[0] * snake_block) - y1
+        return dx, dy
+    else:
+        possible_moves = [
+            (snake_block, 0), (-snake_block, 0), (0, snake_block), (0, -snake_block)
+        ]
+        for move in possible_moves:
+            new_x = x1 + move[0]
+            new_y = y1 + move[1]
+            if (0 <= new_x < width and 0 <= new_y < height and 
+                [new_x, new_y] not in snake_list):
+                return move
+        
+        return 0, 0
 
 def gameLoop():
     game_over = False
-    game_close = False
-
-    x1 = width / 2
-    y1 = height / 2
-
+    x1 = width // 2
+    y1 = height // 2
     x1_change = 0
     y1_change = 0
-
     snake_list = []
     length_of_snake = 1
+    score = 0
 
-    foodx = round(random.randrange(0, width - snake_block) / 20.0) * 20.0
-    foody = round(random.randrange(0, height - snake_block) / 20.0) * 20.0
+    foodx = round(random.randrange(0, width - snake_block) / snake_block) * snake_block
+    foody = round(random.randrange(0, height - snake_block) / snake_block) * snake_block
 
     while not game_over:
-        while game_close:
-            window.fill(BLACK)
-            message("You Lost! Press Q-Quit or C-Play Again", RED)
-            pygame.display.update()
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                game_over = True
 
-            for event in pygame.event.get():
-                if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_q:
-                        game_over = True
-                        game_close = False
-                    if event.key == pygame.K_c:
-                        gameLoop()
-
-        # AI decision making
-        decisions = ai_make_decision(x1, y1, foodx, foody, snake_list)
-        x1_change, y1_change = decisions
+        x1_change, y1_change = ai_make_decision(x1, y1, foodx, foody, snake_list)
 
         if x1 >= width or x1 < 0 or y1 >= height or y1 < 0:
-            game_close = True
+            game_over = True
+            break
 
         x1 += x1_change
         y1 += y1_change
         window.fill(BLACK)
         pygame.draw.rect(window, RED, [foodx, foody, snake_block, snake_block])
-        snake_head = []
-        snake_head.append(x1)
-        snake_head.append(y1)
+        snake_head = [x1, y1]
         snake_list.append(snake_head)
 
         if len(snake_list) > length_of_snake:
@@ -86,32 +126,29 @@ def gameLoop():
 
         for x in snake_list[:-1]:
             if x == snake_head:
-                game_close = True
+                game_over = True
 
         our_snake(snake_block, snake_list)
+        message(f"Score: {score}", WHITE)
         pygame.display.update()
 
         if x1 == foodx and y1 == foody:
-            foodx = round(random.randrange(0, width - snake_block) / 20.0) * 20.0
-            foody = round(random.randrange(0, height - snake_block) / 20.0) * 20.0
+            foodx = round(random.randrange(0, width - snake_block) / snake_block) * snake_block
+            foody = round(random.randrange(0, height - snake_block) / snake_block) * snake_block
             length_of_snake += 1
+            score += 1
 
         clock.tick(snake_speed)
 
+    # Show the last frame
+    message("Game Over! Final Score: " + str(score), WHITE)
+    pygame.display.update()
+    
+    # Wait for a few seconds before quitting
+    pygame.time.wait(3000)
+    
     pygame.quit()
     quit()
 
-def ai_make_decision(x1, y1, foodx, foody, snake_list):
-    # Simple AI strategy: Move towards the food
-    if x1 < foodx:
-        return snake_block, 0
-    elif x1 > foodx:
-        return -snake_block, 0
-    elif y1 < foody:
-        return 0, snake_block
-    elif y1 > foody:
-        return 0, -snake_block
-    else:
-        return 0, 0
-
+# Start the game
 gameLoop()
