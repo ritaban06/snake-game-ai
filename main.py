@@ -8,7 +8,7 @@ import heapq
 pygame.init()
 
 # Set up the game window
-width = 600
+width = 1000
 height = 600
 window = pygame.display.set_mode((width, height))
 pygame.display.set_caption("Advanced Snake Game AI")
