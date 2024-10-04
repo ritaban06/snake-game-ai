@@ -7,8 +7,8 @@ from collections import deque
 pygame.init()
 
 # Set up the game window
-width = 400
-height = 400
+width = 1400
+height = 700
 window = pygame.display.set_mode((width, height))
 pygame.display.set_caption("Snake Game AI")
 
