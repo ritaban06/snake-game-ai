@@ -5,13 +5,10 @@
 2. [Features](#features)
 3. [Requirements](#requirements)
 4. [Installation](#installation)
-5. [How to Play](#how-to-play)
-6. [AI Algorithm](#ai-algorithm)
-7. [New Game Elements](#new-game-elements)
-8. [Code Structure](#code-structure)
-9. [Customization](#customization)
-10. [Contributing](#contributing)
-11. [License](#license)
+5. [Game Rules](#game-rules)
+6. [AI Algorithms](#ai-algorithms)
+7. [Customization](#customization)
+8. [License](#license)
 
 ## Introduction
 
@@ -20,12 +17,11 @@ This project implements an enhanced version of the classic Snake game with an AI
 ## Features
 
 - Classic Snake game mechanics with additional elements
-- AI-controlled snake using BFS pathfinding
+- AI-controlled snake using BFS or or A* pathfinding
 - Obstacles to avoid
 - Power-ups for bonus points
 - Score tracking
 - Path visualization
-- Game over screen showing final game state
 - Customizable game parameters
 
 ## Requirements
@@ -51,62 +47,41 @@ python main.py
 
 ## How to Play
 
-- The game starts automatically with the AI controlling the snake.
+Use the arrow keys to navigate the start menu and press Enter to select a game mode:
+
+- Single Player (BFS): AI snake uses Breadth-First Search algorithm
+- Single Player (A*): AI snake uses A* pathfinding algorithm
+- Multi-snake Mode: Two AI-controlled snakes compete
 - Watch as the AI navigates the snake to eat the food, avoid obstacles, and collect power-ups.
 - The game ends when the snake collides with the wall, an obstacle, or itself.
 - After the game ends, the final state is displayed for 3 seconds before the program closes.
 
-## AI Algorithm
+## Game Rules
 
-The AI uses a Breadth-First Search (BFS) algorithm to find the shortest path to the food or power-ups. Here's how it works:
+- The snake grows longer as it eats food (red squares)
+- Avoid hitting the walls, obstacles (blue squares), or the snake's own body
+- Collect power-ups (yellow squares) for bonus points
+- The game speeds up as you progress through levels
 
-1. The game board is represented as a grid.
-2. The snake's body and obstacles are marked as blocked cells in the grid.
-3. BFS is used to find the shortest path from the snake's head to the food or power-up.
-4. If a path is found, the snake moves along that path.
-5. If no path is found, the AI tries to move to a safe adjacent cell.
-6. If no safe move is available, the snake continues in its current direction.
+## AI Algorithms
 
-## New Game Elements
+The game implements two pathfinding algorithms for the AI:
 
-### Obstacles
-- Static obstacles are randomly placed on the game board at the start of each game.
-- The snake must navigate around these obstacles to reach the food.
+1. Breadth-First Search (BFS): Explores all neighbor squares evenly to find the shortest path to the food.
+2. A* (A-star): Uses a heuristic to guide the search towards the food more efficiently.
 
-### Power-ups
-- Power-ups occasionally spawn on the game board.
-- Collecting a power-up gives bonus points and may provide temporary abilities (e.g., speed boost, invincibility).
-
-### Path Visualization
-- The planned path of the AI is visualized on the game board, allowing you to see the AI's decision-making process in real-time.
-
-## Code Structure
-
-- `snake_game_ai.py`: Main game file containing all the code
-  - `bfs()`: Implements the Breadth-First Search algorithm
-  - `ai_make_decision()`: Decides the next move for the AI, considering obstacles and power-ups
-  - `gameLoop()`: Main game loop handling game states, drawing, and new game elements
-  - `our_snake()`: Draws the snake on the screen
-  - `message()`: Displays text messages on the screen
+The AI considers obstacles, power-ups, and its own body when planning paths.
 
 ## Customization
 
-You can customize various aspects of the game by modifying the constants at the beginning of the script:
+You can modify various game parameters in the `main.py` file:
 
-- `width` and `height`: Change the size of the game window
-- `snake_block`: Adjust the size of the snake, food, and obstacle blocks
-- `snake_speed`: Modify the speed of the game
-- `obstacle_count`: Change the number of obstacles in the game
-- `power_up_duration`: Adjust the duration of power-up effects
+- `width` and `height`: Change the game window size
+- `snake_block`: Adjust the size of the snake and grid squares
+- `initial_speed`: Set the starting game speed
+- `obstacle_count`: Change the number of obstacles
+- `power_up_duration`: Adjust how long power-ups last
 
-## Contributing
-
-Contributions to this project are welcome! Here are some ways you can contribute:
-
-1. Report bugs
-2. Suggest enhancements
-3. Add new features (e.g., new AI algorithms, game modes)
-4. Improve documentation
 
 Please fork the repository and create a pull request with your changes.
 
@@ -115,5 +90,3 @@ Please fork the repository and create a pull request with your changes.
 This project is open source and available under the [MIT License](LICENSE).
 
 ---
-
-Enjoy playing and learning from this Enhanced Snake Game AI! If you have any questions or suggestions, please open an issue on the GitHub repository.
